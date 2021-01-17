@@ -1,6 +1,6 @@
-// import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cart/item.dart';
-import 'package:bloc/bloc.dart';
+import 'package:rxdart/rxdart.dart';
+//import 'package:rxdart/rxdart.dart';
 
 enum CartEventType { add, remove }
 
@@ -11,55 +11,31 @@ class CartEvent {
   CartEvent(this.type, this.item);
 }
 
-class CartBloc extends Bloc<CartEvent, List<Item>> {
-  List<Item> items = [];
+class CartBloc {
+  final itemList = [
+    Item('맥북', 2000000),
+    Item('생존코딩', 32000),
+    Item('될때까지 안드로이드', 40000),
+    Item('새우깡', 1200),
+    Item('신라면', 2000)
+  ];
 
-  @override
-  List<Item> get initialState => [];
+  final _cartList = List<Item>();
+  final _cartListSubject = BehaviorSubject<List<Item>>.seeded([]);
+  // final _cartListSubject = BehaviorSubject<List<Item>>();
 
-  @override
-  Stream<List<Item>> mapEventToState(CartEvent event) async* {
+  Stream<List<Item>> get cartList => _cartListSubject.stream;
+
+  void add(CartEvent event) {
     switch(event.type) {
-      case CartEventType.add:
-        items.add(event.item);
-        break;
       case CartEventType.remove:
-        items.remove(event.item);
+        _cartList.remove(event.item);
+        break;
+      case CartEventType.add:
+        _cartList.add(event.item);
         break;
     }
-    yield items;
+
+    _cartListSubject.add(_cartList);
   }
 }
-
-// enum CartEventType { add, remove }
-//
-// class CartEvent {
-//   final CartEventType type;
-//   final Item item;
-//
-//   CartEvent(this.type, this.item);
-// }
-//
-// class CartBloc extends Bloc<CartEvent, List<Item>> {
-//   // CartBloc(List<Item> initialState) : super(initialState);
-//   List<Item> items = [];
-//
-//   CartBloc(List<Item> initialState) : super(initialState);
-//
-//   @override
-//   List<Item> get initialState => [];
-//
-//   @override
-//   Stream<List<Item>> mapEventToState(CartEvent event) async* {
-//     switch (event.type) {
-//       case CartEventType.add:
-//         items.add(event.item);
-//         break;
-//       case CartEventType.remove:
-//         items.remove(event.item);
-//         break;
-//     }
-//
-//     yield items;
-//   }
-// }
